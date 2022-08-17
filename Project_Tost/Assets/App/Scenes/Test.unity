@@ -262,11 +262,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b9fb01069422ab4bb42b723e83973d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pooledObjects: []
   tostComponents:
   - {fileID: 1097985096150734512, guid: 99ed4ad0003bcfc4e8cffd2888673910, type: 3}
   - {fileID: 1120352780201901226, guid: baa94eb7b75675341bdfe7372af98851, type: 3}
-  mainCamera: {fileID: 963194225}
-  componentState: 0
+  poolAmount: 20
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
