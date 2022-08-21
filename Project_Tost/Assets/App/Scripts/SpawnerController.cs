@@ -4,29 +4,28 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class SpawnerController : MonoBehaviour
 {
-	[SerializeField] private List<GameObject> pooledObjects;
-
 	[SerializeField] private GameObject[] tostComponents;
 
-	[SerializeField] private int poolAmount;
+	[SerializeField] private List<GameObject> tostPool;
 
+	[SerializeField] private int poolSize;
 
-	GameObject tostComponentInstance;
+	private GameObject currentObject;
 
-	#region UnityEditor
-	private void Start()
+	private void Awake()
 	{
-		pooledObjects = new List<GameObject>();
-		GameObject tostComponentInstance;
+		tostPool = new List<GameObject>();
 
-		foreach (GameObject component in tostComponents)
+		foreach (GameObject tost in tostComponents)
 		{
-			for (int i = 0; i < poolAmount; i++)
+			for (int i = 0; i < poolSize; i++)
 			{
-				tostComponentInstance = Instantiate(component,transform);
-				tostComponentInstance.transform.SetParent(transform);
-				tostComponentInstance.SetActive(false);
-				pooledObjects.Add(tostComponentInstance);
+				GameObject tostInsctance = Instantiate(tost, transform);
+				tostInsctance.transform.SetParent(transform);
+				tostInsctance.SetActive(false);
+
+				tostPool.Add(tostInsctance);
+
 			}
 		}
 
@@ -35,10 +34,21 @@ public class SpawnerController : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			pooledObjects.Remove(tostComponentInstance);
-			tostComponentInstance.SetActive(true);
+			currentObject = tostPool[Random.Range(0, tostPool.Count)];
+
+			if (!currentObject.activeInHierarchy)
+			{ 
+				currentObject.SetActive(true);
+				StartCoroutine(MakeDynamic(currentObject));
+			}
+			
+
 		}
 	}
-	#endregion
+	private IEnumerator MakeDynamic(GameObject obj)
+	{
+		yield return new WaitForSeconds(0.2f);
+		obj.GetComponent<Rigidbody>().isKinematic = false;
+	}
 
 }
