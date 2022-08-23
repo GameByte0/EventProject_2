@@ -228,7 +228,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 397312723}
-  - component: {fileID: 397312725}
+  - component: {fileID: 397312724}
   m_Layer: 0
   m_Name: ObjectSpawner
   m_TagString: Untagged
@@ -250,7 +250,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &397312725
+--- !u!114 &397312724
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -263,11 +263,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locationList:
-  - {fileID: 11400000, guid: 5e08bf89c3bf4a5498132b3e7473ec5c, type: 2}
   - {fileID: 11400000, guid: a4664dfe35033f84dabd76cbc993111c, type: 2}
+  - {fileID: 11400000, guid: 5e08bf89c3bf4a5498132b3e7473ec5c, type: 2}
   mainPool: []
   poolSize: 10
   currentLocation: 1
+  speed: 5
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
