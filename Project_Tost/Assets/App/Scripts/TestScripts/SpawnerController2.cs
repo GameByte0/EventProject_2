@@ -16,7 +16,9 @@ public class SpawnerController2 : MonoBehaviour
 
 	[SerializeField] private int speed;
 
-	private GameObject currentlyPoolingObject;
+	private GameObject currentlyUsingObject;
+
+	private bool isActivated=true;
 
 
 
@@ -44,26 +46,23 @@ public class SpawnerController2 : MonoBehaviour
 	private void Update()
 	{
 		SpawnerMove();
+		MakeVisible();
 
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			currentlyPoolingObject = mainPool[Random.Range(0, mainPool.Count)];
+			
+			currentlyUsingObject.transform.SetParent(null);
+			StartCoroutine(MakeDynamic(currentlyUsingObject));
+			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y);
+			mainPool.Remove(currentlyUsingObject);
 
-			if (!currentlyPoolingObject.activeInHierarchy)
-			{
-				currentlyPoolingObject.SetActive(true);
-				currentlyPoolingObject.transform.position = transform.position;
-				StartCoroutine(MakeDynamic(currentlyPoolingObject));
-				SpawnerPositionChange(currentlyPoolingObject.transform.localScale.y);
-				mainPool.Remove(currentlyPoolingObject);
-
-			}
+			isActivated = true;
 		}
 	}
 	#endregion
 
 	private void PoolingProcess()
-	{
+	{//if need to add new location just create scriptable object and case for location//
 		switch (currentLocation)
 		{
 			case Location.DEFAULT:
@@ -74,11 +73,13 @@ public class SpawnerController2 : MonoBehaviour
 					{
 						GameObject objInstance = Instantiate(obj);
 						objInstance.SetActive(false);
+						objInstance.transform.SetParent(transform);
 
 						mainPool.Add(objInstance);
 					}
 				}
 				break;
+
 			case Location.WOODLANDIA:
 				mainPool.Clear();
 				foreach (GameObject obj in componentsDictionary["Woodlandia"])
@@ -87,11 +88,28 @@ public class SpawnerController2 : MonoBehaviour
 					{
 						GameObject objInstance = Instantiate(obj);
 						objInstance.SetActive(false);
+						objInstance.transform.SetParent(transform);
 
 						mainPool.Add(objInstance);
 					}
 				}
 				break;
+
+			case Location.MIX:
+				mainPool.Clear();
+				foreach (GameObject obj in componentsDictionary["Mix"])
+				{
+					for (int i = 0; i < poolSize; i++)
+					{
+						GameObject objInstance = Instantiate(obj);
+						objInstance.SetActive(false);
+						objInstance.transform.SetParent(transform);
+
+						mainPool.Add(objInstance);
+					}
+				}
+				break;
+
 			default:
 				Debug.Log("Location is not Selected ");
 				break;
@@ -100,14 +118,17 @@ public class SpawnerController2 : MonoBehaviour
 
 	private IEnumerator MakeDynamic(GameObject obj)
 	{
-		yield return new WaitForSeconds(0.2f);
+		yield return new WaitForEndOfFrame();
 		obj.GetComponent<Rigidbody>().isKinematic = false;
 	}
 
 	private void SpawnerPositionChange(float height)
 	{
 		//Raises Spawner's positioan by spawned objects localScale.y
-		transform.position += new Vector3(0, height, 0);
+		transform.position += new Vector3(0, height+0.5f, 0);
+
+		//Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit);
+		//transform.position += new Vector3(0,hit.transform.position.y+5.5f,0);
 	}
 
 	private void SpawnerMove()
@@ -115,9 +136,24 @@ public class SpawnerController2 : MonoBehaviour
 		//Makes Spawner move horizontally
 		transform.position = new Vector3(Mathf.PingPong(Time.time * speed, 10) - 5, transform.position.y, transform.position.z);
 	}
+
+	private void MakeVisible()
+	{
+		if (isActivated)
+		{
+			currentlyUsingObject = mainPool[Random.Range(0, mainPool.Count)];
+			currentlyUsingObject.SetActive(true);
+			currentlyUsingObject.transform.position = transform.position;
+			isActivated = false;
+		}
+		
+
+	}
+
 	private enum Location
 	{
 		DEFAULT,
-		WOODLANDIA
+		WOODLANDIA,
+		MIX
 	}
 }
