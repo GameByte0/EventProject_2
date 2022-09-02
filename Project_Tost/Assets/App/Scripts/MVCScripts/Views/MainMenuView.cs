@@ -1,3 +1,4 @@
+using DynamicBox.EventManagement;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,47 +14,13 @@ public class MainMenuView : MonoBehaviour
 
 	[SerializeField] private Button settingsButton;
 
-	[SerializeField] private GameObject mainMenuPanel;
 
-	[SerializeField] private GameObject shopMenuPanel;
-
-	[SerializeField] private GameObject settingsMenuPanel;
-
-
-	public void OnPlayButtonPressed()
+	public void OnShopMenuButtonPressed()
 	{
-		shopMenuPanel.SetActive(false);
-
-		settingsMenuPanel.SetActive(false);
-
-		mainMenuPanel.SetActive(false);
+		controller.OnShopMenuButtonPressed();
 	}
-
-	public void OnSettingsButtonPressed()
+	public void OnSettingsMenuButtonPressed()
 	{
-		shopMenuPanel.SetActive(false);
-
-		settingsMenuPanel.SetActive(true);
-
-		mainMenuPanel.SetActive(false);
-	}
-
-
-	public void OnShopButtonPressed()
-	{
-		shopMenuPanel.SetActive(true);
-
-		settingsMenuPanel.SetActive(false);
-
-		mainMenuPanel.SetActive(false);
-	}
-
-	public void OnExitButtonPressed()
-	{
-		shopMenuPanel.SetActive(false);
-
-		settingsMenuPanel.SetActive(false);
-
-		mainMenuPanel.SetActive(true);
+		controller.OnSettingsMenuButtonPressed();
 	}
 }
