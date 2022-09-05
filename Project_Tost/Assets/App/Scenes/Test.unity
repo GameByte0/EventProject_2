@@ -742,7 +742,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 397312722}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
@@ -766,8 +766,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5e08bf89c3bf4a5498132b3e7473ec5c, type: 2}
   - {fileID: 11400000, guid: 97732cd0a2c38094a8c72153f99209d1, type: 2}
   mainPool: []
-  poolSize: 20
-  currentLocation: 2
+  reservPool: []
+  poolSize: 10
+  currentLocation: 0
   speed: 5
 --- !u!1 &705507993
 GameObject:
@@ -1070,13 +1071,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.2840153, y: -0, z: -0, w: 0.95881975}
+  m_LocalRotation: {x: 0.323361, y: -0, z: -0, w: 0.9462757}
   m_LocalPosition: {x: 0, y: 6.8100014, z: -13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 397312723}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 33, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 37.733, y: 0, z: 0}
 --- !u!1 &1047628622
 GameObject:
   m_ObjectHideFlags: 0

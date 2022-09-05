@@ -1,16 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DynamicBox.EventManagement;
 
 public class SpawnerController2 : MonoBehaviour
 {
+	[Header("Pools")]
 	[SerializeField] private Dictionary<string, List<GameObject>> componentsDictionary;
 
 	[SerializeField] private List<LocationsSO> locationList;
 
 	[SerializeField] private List<GameObject> mainPool;
 
+	[SerializeField] private List<GameObject> reservPool;
+
 	[SerializeField] private int poolSize;
+
 
 	[SerializeField] private Location currentLocation;
 
@@ -20,9 +25,23 @@ public class SpawnerController2 : MonoBehaviour
 
 	private bool isActivated=true;
 
+	private float cooldownTime=1f;
+
+	private float nextDropTime;
+
+	private int componentDropedCount;
+
 
 
 	#region Unity Methods
+	private void OnEnable()
+	{
+		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
+	}
+	private void OnDisable()
+	{
+		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
+	}
 	private void Awake()
 	{
 		componentsDictionary = new Dictionary<string, List<GameObject>>();
@@ -48,15 +67,24 @@ public class SpawnerController2 : MonoBehaviour
 		SpawnerMove();
 		MakeVisible();
 
-		if (Input.GetKeyDown(KeyCode.Space))
+		if (componentDropedCount>=10)
 		{
+			DeactivateTostComponent();
+		}
+
+		if (Input.GetKeyDown(KeyCode.Space) && Time.time>nextDropTime)
+		{
+			nextDropTime = Time.time + cooldownTime;
 			
 			currentlyUsingObject.transform.SetParent(null);
 			StartCoroutine(MakeDynamic(currentlyUsingObject));
 			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y);
 			mainPool.Remove(currentlyUsingObject);
+			reservPool.Add(currentlyUsingObject);
 
 			isActivated = true;
+
+			componentDropedCount++;
 		}
 	}
 	#endregion
@@ -139,7 +167,7 @@ public class SpawnerController2 : MonoBehaviour
 
 	private void MakeVisible()
 	{
-		if (isActivated)
+		if (isActivated&&mainPool.Count!=0)
 		{
 			currentlyUsingObject = mainPool[Random.Range(0, mainPool.Count)];
 			currentlyUsingObject.SetActive(true);
@@ -150,6 +178,19 @@ public class SpawnerController2 : MonoBehaviour
 
 	}
 
+	private void DeactivateTostComponent()
+	{
+		if (reservPool.Count>=10)
+		{
+			GameObject componentToDeactivate = reservPool[0];
+			componentToDeactivate.GetComponent<Rigidbody>().isKinematic=true;
+			reservPool.Remove(componentToDeactivate);
+		}
+	}
+	private void OnTostComponentCollidesEventHandler(OnTostComponentCollidesEvent eventDetails)
+	{
+		DeactivateTostComponent();
+	}
 	private enum Location
 	{
 		DEFAULT,

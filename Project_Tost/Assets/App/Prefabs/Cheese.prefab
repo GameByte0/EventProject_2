@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 1097985096150734527}
   - component: {fileID: 1097985096150734526}
   - component: {fileID: 1097985096150734513}
+  - component: {fileID: -4986893718674802979}
   m_Layer: 0
   m_Name: Cheese
-  m_TagString: Untagged
+  m_TagString: Component
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 20
@@ -112,3 +113,15 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-4986893718674802979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1097985096150734512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 913d9e73af4060f42b94ddb6de6b459e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
