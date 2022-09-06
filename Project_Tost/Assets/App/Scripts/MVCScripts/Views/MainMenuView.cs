@@ -23,4 +23,9 @@ public class MainMenuView : MonoBehaviour
 	{
 		controller.OnSettingsMenuButtonPressed();
 	}
+
+	public void OnPlayButtonPressed()
+	{
+		controller.OnPlayButtonPressed();
+	}
 }

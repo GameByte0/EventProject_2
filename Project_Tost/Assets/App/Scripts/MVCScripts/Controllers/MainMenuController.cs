@@ -24,6 +24,12 @@ public class MainMenuController : MonoBehaviour
 		view.gameObject.SetActive(false);
 	}
 
+	public void OnPlayButtonPressed()
+	{
+		EventManager.Instance.Raise(new OnPlayButtonPressedEvent());
+		view.gameObject.SetActive(false);
+	}
+
 	private void OnExitButtonPressedEventHandler(OnExitButtonPressedEvent eventDetails)
 	{
 		view.gameObject.SetActive(true);
