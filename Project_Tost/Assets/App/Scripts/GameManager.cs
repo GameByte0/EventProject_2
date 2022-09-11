@@ -17,19 +17,26 @@ public class GameManager : MonoBehaviour
 	private void OnEnable()
 	{
 		EventManager.Instance.AddListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
+		EventManager.Instance.AddListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
 	}
 
 	private void OnDisable()
 	{
 		EventManager.Instance.RemoveListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
+		EventManager.Instance.RemoveListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
 	}
 
 	private void Update()
 	{
-		if (gameState==GameState.GamePlay)
+		if (gameState == GameState.GamePlay)
 		{
 			spawner.SetActive(true);
 			mainCamera.transform.SetParent(spawner.transform);
+		}
+		else if (gameState == GameState.Pause)
+		{
+			spawner.SetActive(false);
+			mainCamera.transform.SetParent(null);
 		}
 	}
 	#endregion
@@ -37,6 +44,10 @@ public class GameManager : MonoBehaviour
 	private void OnPlayButtonPressedEventHandler(OnPlayButtonPressedEvent eventDetails)
 	{
 		gameState = GameState.GamePlay;
+	}
+	private void OnExitButtonPressedEventHandler(OnExitButtonPressedEvent eventDetails)
+	{
+		gameState = GameState.Pause;
 	}
 
 	private enum GameState

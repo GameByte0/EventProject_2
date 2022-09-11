@@ -5,9 +5,10 @@ using DynamicBox.EventManagement;
 
 public class SpawnerController2 : MonoBehaviour
 {
-	[Header("Pools")]
+
 	[SerializeField] private Dictionary<string, List<GameObject>> componentsDictionary;
 
+	[Header("Pools and Settings")]
 	[SerializeField] private List<LocationsSO> locationList;
 
 	[SerializeField] private List<GameObject> mainPool;
@@ -16,6 +17,8 @@ public class SpawnerController2 : MonoBehaviour
 
 	[SerializeField] private int poolSize;
 
+	[Header("Additional Settings")]
+	[SerializeField] GameObject DeadZone;
 
 	[SerializeField] private Location currentLocation;
 
@@ -23,13 +26,17 @@ public class SpawnerController2 : MonoBehaviour
 
 	private GameObject currentlyUsingObject;
 
-	private bool isActivated=true;
+	private Vector3 defaultSpawnerPosition = new Vector3(0f, 3f, 0f);
 
-	private float cooldownTime=1f;
+	private bool isActivated = true;
+
+	private float cooldownTime = 1f;
 
 	private float nextDropTime;
 
-	private int componentDropedCount;
+	private int reservPoolIndex;
+
+	private bool isReserveObjectAdded;
 
 
 
@@ -41,6 +48,7 @@ public class SpawnerController2 : MonoBehaviour
 	private void OnDisable()
 	{
 		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
+
 	}
 	private void Awake()
 	{
@@ -67,24 +75,23 @@ public class SpawnerController2 : MonoBehaviour
 		SpawnerMove();
 		MakeVisible();
 
-		if (componentDropedCount>=10)
-		{
-			DeactivateTostComponent();
-		}
+		DeactivateTostComponent();
 
-		if (Input.GetKeyDown(KeyCode.Space) && Time.time>nextDropTime)
+		if (Input.GetKeyDown(KeyCode.Space) && Time.time > nextDropTime)
 		{
+			//CooldDown process
 			nextDropTime = Time.time + cooldownTime;
-			
+
 			currentlyUsingObject.transform.SetParent(null);
 			StartCoroutine(MakeDynamic(currentlyUsingObject));
 			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y);
 			mainPool.Remove(currentlyUsingObject);
 			reservPool.Add(currentlyUsingObject);
+			isReserveObjectAdded = true;
+			//currentlyUsingObject.GetComponent<Rigidbody>().velocity = Vector3.down * 10;
+			EventManager.Instance.Raise(new OnTostComponentDropsEvent());
 
 			isActivated = true;
-
-			componentDropedCount++;
 		}
 	}
 	#endregion
@@ -146,17 +153,17 @@ public class SpawnerController2 : MonoBehaviour
 
 	private IEnumerator MakeDynamic(GameObject obj)
 	{
-		yield return new WaitForEndOfFrame();
+		yield return new WaitForFixedUpdate();
 		obj.GetComponent<Rigidbody>().isKinematic = false;
 	}
 
 	private void SpawnerPositionChange(float height)
 	{
-		//Raises Spawner's positioan by spawned objects localScale.y
-		transform.position += new Vector3(0, height+0.5f, 0);
+		//Raises Spawner's positioan by spawned objects localScale.y//
 
-		//Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit);
-		//transform.position += new Vector3(0,hit.transform.position.y+5.5f,0);
+		//***Remove 0.5f after adding real prefabs***//
+		transform.position += new Vector3(0, height + 0.5f, 0);
+		DeadZone.transform.position += new Vector3(0f, height, 0f);
 	}
 
 	private void SpawnerMove()
@@ -167,24 +174,26 @@ public class SpawnerController2 : MonoBehaviour
 
 	private void MakeVisible()
 	{
-		if (isActivated&&mainPool.Count!=0)
+		if (isActivated && mainPool.Count != 0)
 		{
 			currentlyUsingObject = mainPool[Random.Range(0, mainPool.Count)];
 			currentlyUsingObject.SetActive(true);
 			currentlyUsingObject.transform.position = transform.position;
 			isActivated = false;
 		}
-		
+
 
 	}
 
 	private void DeactivateTostComponent()
 	{
-		if (reservPool.Count>=10)
+		if (reservPool.Count >= 10 && isReserveObjectAdded)
 		{
-			GameObject componentToDeactivate = reservPool[0];
-			componentToDeactivate.GetComponent<Rigidbody>().isKinematic=true;
-			reservPool.Remove(componentToDeactivate);
+			GameObject componentToDeactivate = reservPool[reservPoolIndex];
+			//componentToDeactivate.GetComponent<Rigidbody>().isKinematic = true;
+			reservPoolIndex++;
+			isReserveObjectAdded = false;
+			//Work with pool clearing integration
 		}
 	}
 	private void OnTostComponentCollidesEventHandler(OnTostComponentCollidesEvent eventDetails)

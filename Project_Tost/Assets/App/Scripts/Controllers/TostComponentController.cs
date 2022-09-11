@@ -5,8 +5,8 @@ using DynamicBox.EventManagement;
 
 public class TostComponentController : MonoBehaviour
 {
-	//private void OnCollisionEnter(Collision collision)
-	//{
-	//	EventManager.Instance.Raise(new OnTostComponentCollidesEvent());
-	//}
+	private void OnCollisionEnter(Collision collision)
+	{
+		//gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+	}
 }
