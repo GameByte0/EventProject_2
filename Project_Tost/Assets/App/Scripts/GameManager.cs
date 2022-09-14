@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
 
 	[SerializeField] private GameObject mainCamera;
 
+	private int deadZoneEnterCount;
+
 	private GameState gameState;
 
 	#region Unity Editor
@@ -18,16 +20,22 @@ public class GameManager : MonoBehaviour
 	{
 		EventManager.Instance.AddListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.AddListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
+		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 	}
 
 	private void OnDisable()
 	{
 		EventManager.Instance.RemoveListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.RemoveListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
+		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 	}
 
 	private void Update()
 	{
+		if (deadZoneEnterCount==3)
+		{
+			gameState = GameState.GameOver;
+		}
 		if (gameState == GameState.GamePlay)
 		{
 			spawner.SetActive(true);
@@ -37,6 +45,10 @@ public class GameManager : MonoBehaviour
 		{
 			spawner.SetActive(false);
 			mainCamera.transform.SetParent(null);
+		}
+		else if (gameState == GameState.GameOver)
+		{
+			deadZoneEnterCount = 0;
 		}
 	}
 	#endregion
@@ -49,11 +61,16 @@ public class GameManager : MonoBehaviour
 	{
 		gameState = GameState.Pause;
 	}
-
+	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
+	{
+		deadZoneEnterCount++;
+		print(deadZoneEnterCount);
+	}
 	private enum GameState
 	{
 		MainMenu,
 		GamePlay,
-		Pause
+		Pause,
+		GameOver
 	}
 }

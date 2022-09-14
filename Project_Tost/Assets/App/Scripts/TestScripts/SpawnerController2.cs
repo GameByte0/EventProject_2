@@ -44,10 +44,12 @@ public class SpawnerController2 : MonoBehaviour
 	private void OnEnable()
 	{
 		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
+		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 	}
 	private void OnDisable()
 	{
 		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
+		EventManager.Instance.RemoveListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 
 	}
 	private void Awake()
@@ -84,7 +86,7 @@ public class SpawnerController2 : MonoBehaviour
 
 			currentlyUsingObject.transform.SetParent(null);
 			StartCoroutine(MakeDynamic(currentlyUsingObject));
-			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y);
+			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y,"Up");
 			mainPool.Remove(currentlyUsingObject);
 			reservPool.Add(currentlyUsingObject);
 			isReserveObjectAdded = true;
@@ -157,13 +159,24 @@ public class SpawnerController2 : MonoBehaviour
 		obj.GetComponent<Rigidbody>().isKinematic = false;
 	}
 
-	private void SpawnerPositionChange(float height)
+	private void SpawnerPositionChange(float height,string direction)
 	{
 		//Raises Spawner's positioan by spawned objects localScale.y//
 
-		//***Remove 0.5f after adding real prefabs***//
-		transform.position += new Vector3(0, height + 0.5f, 0);
-		DeadZone.transform.position += new Vector3(0f, height, 0f);
+		
+
+
+		if (direction=="Up")
+		{
+			//***Remove 0.5f after adding real prefabs***//
+			transform.position += new Vector3(0, height + 0.5f, 0);
+			DeadZone.transform.position += new Vector3(0f, height, 0f);
+		}
+		else if (direction=="Down")
+		{
+			transform.position -= new Vector3(0, height + 0.5f, 0);
+			DeadZone.transform.position -= new Vector3(0f, height, 0f);
+		}
 	}
 
 	private void SpawnerMove()
@@ -190,7 +203,7 @@ public class SpawnerController2 : MonoBehaviour
 		if (reservPool.Count >= 10 && isReserveObjectAdded)
 		{
 			GameObject componentToDeactivate = reservPool[reservPoolIndex];
-			//componentToDeactivate.GetComponent<Rigidbody>().isKinematic = true;
+			componentToDeactivate.GetComponent<Rigidbody>().isKinematic = true;
 			reservPoolIndex++;
 			isReserveObjectAdded = false;
 			//Work with pool clearing integration
@@ -199,6 +212,10 @@ public class SpawnerController2 : MonoBehaviour
 	private void OnTostComponentCollidesEventHandler(OnTostComponentCollidesEvent eventDetails)
 	{
 		DeactivateTostComponent();
+	}
+	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
+	{
+		SpawnerPositionChange(eventDetails.LoweringHeight, "Down");
 	}
 	private enum Location
 	{

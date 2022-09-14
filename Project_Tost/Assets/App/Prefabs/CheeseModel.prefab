@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1097985096150734513}
   - component: {fileID: -4986893718674802979}
   m_Layer: 0
-  m_Name: Cheese
+  m_Name: CheeseModel
   m_TagString: Component
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

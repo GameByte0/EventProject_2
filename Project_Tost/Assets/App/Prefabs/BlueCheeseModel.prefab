@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2917881183619012314}
   - component: {fileID: 7937134322018163674}
   m_Layer: 0
-  m_Name: BlueChees
+  m_Name: BlueCheeseModel
   m_TagString: Component
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

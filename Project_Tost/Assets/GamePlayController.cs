@@ -18,13 +18,16 @@ public class GamePlayController : MonoBehaviour
 	{
 		EventManager.Instance.AddListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.AddListener<OnTostComponentDropsEvent>(OnTostComponentDropsEventHandler);
+		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 	}
 	private void OnDisable()
 	{
 		EventManager.Instance.RemoveListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.RemoveListener<OnTostComponentDropsEvent>(OnTostComponentDropsEventHandler);
+		EventManager.Instance.RemoveListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 	}
 
+	
 
 	private void Start()
 	{
@@ -54,6 +57,10 @@ public class GamePlayController : MonoBehaviour
 	private void OnTostComponentDropsEventHandler(OnTostComponentDropsEvent eventDetails)
 	{
 		levelProgress++;
+	}
+	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
+	{
+		levelProgress--;
 	}
 
 	private void SetGamePlayView()
