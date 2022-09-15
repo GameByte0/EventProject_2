@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DynamicBox.EventManagement;
-using System;
+using UnityEngine.UI;
 
 public class GamePlayController : MonoBehaviour
 {
 	[SerializeField] private GamePlayView view;
+
+
+	private int maxHealth=3;
 
 	private static int levelText = 1;
 
@@ -31,7 +34,7 @@ public class GamePlayController : MonoBehaviour
 
 	private void Start()
 	{
-		//SetGamePlayView();
+		SetHealth();
 	}
 	private void Update()
 	{
@@ -49,6 +52,24 @@ public class GamePlayController : MonoBehaviour
 		EventManager.Instance.Raise(new OnExitButtonPressedEvent());
 		view.gameObject.SetActive(false);
 	}
+	private void SetGamePlayView()
+	{
+		view.SetGamePlayView(levelText.ToString(), levelProgress, maxLevelValue);
+	}
+
+
+	private void SetHealth()
+	{
+		view.SetHealth(maxHealth);
+	}
+	private void ChangeHealthCount()
+	{
+		view.ChangeHealthCount();
+	}
+
+
+
+	#region EventHandlers
 	private void OnPlayButtonPressedEventHandler(OnPlayButtonPressedEvent eventDetails)
 	{
 		view.gameObject.SetActive(true);
@@ -61,10 +82,10 @@ public class GamePlayController : MonoBehaviour
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
 	{
 		levelProgress--;
+		ChangeHealthCount();
 	}
+	#endregion
 
-	private void SetGamePlayView()
-	{
-		view.SetGamePlayView(levelText.ToString(), levelProgress, maxLevelValue);
-	}
+
+
 }
