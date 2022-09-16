@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DynamicBox.EventManagement;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GamePlayController : MonoBehaviour
 {
@@ -22,19 +22,21 @@ public class GamePlayController : MonoBehaviour
 		EventManager.Instance.AddListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.AddListener<OnTostComponentDropsEvent>(OnTostComponentDropsEventHandler);
 		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
+		EventManager.Instance.AddListener<OnRestartButtonPressedEvent>(OnRestartButtonPressedEventHandler);
 	}
 	private void OnDisable()
 	{
 		EventManager.Instance.RemoveListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.RemoveListener<OnTostComponentDropsEvent>(OnTostComponentDropsEventHandler);
 		EventManager.Instance.RemoveListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
+		EventManager.Instance.RemoveListener<OnRestartButtonPressedEvent>(OnRestartButtonPressedEventHandler);
 	}
 
 	
 
 	private void Start()
 	{
-		SetHealth();
+		
 	}
 	private void Update()
 	{
@@ -44,6 +46,10 @@ public class GamePlayController : MonoBehaviour
 			levelText++;
 			levelProgress = 0;
 			maxLevelValue += 2;
+		}
+		if (levelProgress<0)
+		{
+			levelProgress = 0;
 		}
 	}
 
@@ -66,6 +72,10 @@ public class GamePlayController : MonoBehaviour
 	{
 		view.ChangeHealthCount();
 	}
+	public void ResetScene()
+	{
+		EventManager.Instance.Raise(new OnRestartButtonPressedEvent());
+	}
 
 
 
@@ -73,19 +83,24 @@ public class GamePlayController : MonoBehaviour
 	private void OnPlayButtonPressedEventHandler(OnPlayButtonPressedEvent eventDetails)
 	{
 		view.gameObject.SetActive(true);
+		SetHealth();
 	}
 
 	private void OnTostComponentDropsEventHandler(OnTostComponentDropsEvent eventDetails)
 	{
 		levelProgress++;
+		
 	}
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
 	{
 		levelProgress--;
+		
 		ChangeHealthCount();
 	}
+	private void OnRestartButtonPressedEventHandler(OnRestartButtonPressedEvent eventDetails)
+	{
+		SetHealth();
+	}
 	#endregion
-
-
 
 }

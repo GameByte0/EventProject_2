@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DynamicBox.EventManagement;
 
 public class GamePlayView : MonoBehaviour
 {
@@ -18,9 +19,9 @@ public class GamePlayView : MonoBehaviour
 	[Header("HealthUI Components:")]
 	[SerializeField] private GameObject healthPanle;
 
-	[SerializeField] private Image healthImage;
+	[SerializeField] private GameObject healthImage;
 
-	[SerializeField] private List<Image> healthImageList;
+	[SerializeField] private List<GameObject> healthImageList;
 
 	public void OnPauseButtonPresed()
 	{
@@ -39,9 +40,13 @@ public class GamePlayView : MonoBehaviour
 
 	public void SetHealth(int health)
 	{
+		if (healthImageList.Count==health)
+		{
+			return;
+		}
 		for (int i = 0; i < health; i++)
 		{
-			Image healthIconInstance = Instantiate(healthImage, healthPanle.transform);
+			GameObject healthIconInstance = Instantiate(healthImage, healthPanle.transform);
 			healthImageList.Add(healthIconInstance);
 		}
 	}
@@ -50,14 +55,19 @@ public class GamePlayView : MonoBehaviour
 	{
 		if (healthImageList.Count!=0)
 		{
-			Destroy(healthImageList[0]);
-			healthImageList.Remove(healthImageList[0]);
+			Destroy(healthImageList[healthImageList.Count-1]);
+			healthImageList.Remove(healthImageList[healthImageList.Count-1]);
 		}
 		else
 		{
 			GameOver.SetActive(true);
 		}
 		
+	}
+	public void RestartScene()
+	{
+		controller.ResetScene();
+		GameOver.SetActive(false);
 	}
 
 }

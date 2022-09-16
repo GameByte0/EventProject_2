@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DynamicBox.EventManagement;
-using System;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,29 +10,41 @@ public class GameManager : MonoBehaviour
 
 	[SerializeField] private GameObject mainCamera;
 
+	private static bool isReloaded=false;
+
 	private int deadZoneEnterCount;
 
 	private GameState gameState;
 
 	#region Unity Editor
 
+	private void Awake()
+	{
+		Time.timeScale = 1;
+		if (isReloaded)
+		{
+			gameState = GameState.GamePlay;
+		}
+	}
 	private void OnEnable()
 	{
 		EventManager.Instance.AddListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.AddListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
 		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
+		EventManager.Instance.AddListener<OnRestartButtonPressedEvent>(OnRestartButtonPressedEventHandler);
 	}
 
 	private void OnDisable()
 	{
 		EventManager.Instance.RemoveListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
 		EventManager.Instance.RemoveListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
-		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
+		EventManager.Instance.RemoveListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
+		EventManager.Instance.RemoveListener<OnRestartButtonPressedEvent>(OnRestartButtonPressedEventHandler);
 	}
 
 	private void Update()
 	{
-		if (deadZoneEnterCount==3)
+		if (deadZoneEnterCount>3)
 		{
 			gameState = GameState.GameOver;
 		}
@@ -48,7 +60,7 @@ public class GameManager : MonoBehaviour
 		}
 		else if (gameState == GameState.GameOver)
 		{
-			deadZoneEnterCount = 0;
+			Time.timeScale = 0.2f;
 		}
 	}
 	#endregion
@@ -64,7 +76,13 @@ public class GameManager : MonoBehaviour
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
 	{
 		deadZoneEnterCount++;
-		print(deadZoneEnterCount);
+		Debug.Log(deadZoneEnterCount);
+	}
+	private void OnRestartButtonPressedEventHandler(OnRestartButtonPressedEvent eventDetails)
+	{
+		SceneManager.UnloadSceneAsync(1);
+		SceneManager.LoadSceneAsync(1,LoadSceneMode.Additive);
+		isReloaded = true;
 	}
 	private enum GameState
 	{
