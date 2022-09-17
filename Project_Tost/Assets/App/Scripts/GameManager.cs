@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
 		EventManager.Instance.AddListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
 		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 		EventManager.Instance.AddListener<OnRestartButtonPressedEvent>(OnRestartButtonPressedEventHandler);
+		EventManager.Instance.AddListener<OnLocationChangedEvent>(OnLocationChangedEventHandler);
 	}
 
 	private void OnDisable()
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviour
 		EventManager.Instance.RemoveListener<OnExitButtonPressedEvent>(OnExitButtonPressedEventHandler);
 		EventManager.Instance.RemoveListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 		EventManager.Instance.RemoveListener<OnRestartButtonPressedEvent>(OnRestartButtonPressedEventHandler);
+		EventManager.Instance.RemoveListener<OnLocationChangedEvent>(OnLocationChangedEventHandler);
 	}
 
 	private void Update()
@@ -67,11 +69,13 @@ public class GameManager : MonoBehaviour
 
 	private void OnPlayButtonPressedEventHandler(OnPlayButtonPressedEvent eventDetails)
 	{
+		Time.timeScale = 1f;
 		gameState = GameState.GamePlay;
 	}
 	private void OnExitButtonPressedEventHandler(OnExitButtonPressedEvent eventDetails)
 	{
 		gameState = GameState.Pause;
+		//Time.timeScale =0;
 	}
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
 	{
@@ -83,6 +87,16 @@ public class GameManager : MonoBehaviour
 		SceneManager.UnloadSceneAsync(1);
 		SceneManager.LoadSceneAsync(1,LoadSceneMode.Additive);
 		isReloaded = true;
+	}
+	private void OnLocationChangedEventHandler(OnLocationChangedEvent eventDetails)
+	{
+		StartCoroutine(ReloadAsync());
+	}
+	private IEnumerator ReloadAsync()
+	{
+		yield return new WaitForSeconds(0.2f);
+		SceneManager.UnloadSceneAsync(1);
+		SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
 	}
 	private enum GameState
 	{

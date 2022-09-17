@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000004, guid: 55cae2ecb86c91e46afbe594823b7be9, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -139,6 +139,10 @@ PrefabInstance:
       propertyPath: DeadZone
       value: 
       objectReference: {fileID: 809764463}
+    - target: {fileID: 5741081159992167387, guid: e5b216388f4d25247bb153e936239ce8, type: 3}
+      propertyPath: poolSize
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 5741081159992167388, guid: e5b216388f4d25247bb153e936239ce8, type: 3}
       propertyPath: m_RootOrder
       value: 1

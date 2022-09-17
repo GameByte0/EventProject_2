@@ -38,6 +38,8 @@ public class SpawnerController2 : MonoBehaviour
 
 	private bool isReserveObjectAdded;
 
+	private bool isPooled = false;
+
 
 
 	#region Unity Methods
@@ -45,6 +47,7 @@ public class SpawnerController2 : MonoBehaviour
 	{
 		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
 		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
+		EventManager.Instance.AddListener<OnLocationChangedEvent>(OnLocationChangedEventHandler);
 	}
 	private void OnDisable()
 	{
@@ -65,28 +68,34 @@ public class SpawnerController2 : MonoBehaviour
 
 	private void Start()
 	{
+		currentLocation = (Location)PlayerPrefs.GetInt("LocationID");
 		for (int i = 0; i < locationList.Count; i++)
 		{
 			componentsDictionary.Add(locationList[i].LocationName, locationList[i].LocationsTostComponents);
 		}
 
-		PoolingProcess();
+
 	}
 	private void Update()
 	{
 		SpawnerMove();
 		MakeVisible();
+		if (!isPooled)
+		{
+			PoolingProcess();
+			isPooled = true;
+		}
 
 		DeactivateTostComponent();
 
-		if (Input.GetKeyDown(KeyCode.Space) && Time.time > nextDropTime)
+		if (Input.GetMouseButtonDown(0) && Time.time > nextDropTime)
 		{
 			//CooldDown process
 			nextDropTime = Time.time + cooldownTime;
 
 			currentlyUsingObject.transform.SetParent(null);
 			StartCoroutine(MakeDynamic(currentlyUsingObject));
-			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y,"Up");
+			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y, "Up");
 			mainPool.Remove(currentlyUsingObject);
 			reservPool.Add(currentlyUsingObject);
 			isReserveObjectAdded = true;
@@ -159,20 +168,20 @@ public class SpawnerController2 : MonoBehaviour
 		obj.GetComponent<Rigidbody>().isKinematic = false;
 	}
 
-	private void SpawnerPositionChange(float height,string direction)
+	private void SpawnerPositionChange(float height, string direction)
 	{
 		//Raises Spawner's positioan by spawned objects localScale.y//
 
-		
 
 
-		if (direction=="Up")
+
+		if (direction == "Up")
 		{
 			//***Remove 0.5f after adding real prefabs***//
 			transform.position += new Vector3(0, height + 0.5f, 0);
 			DeadZone.transform.position += new Vector3(0f, height, 0f);
 		}
-		else if (direction=="Down")
+		else if (direction == "Down")
 		{
 			transform.position -= new Vector3(0, height + 0.5f, 0);
 			DeadZone.transform.position -= new Vector3(0f, height, 0f);
@@ -216,6 +225,11 @@ public class SpawnerController2 : MonoBehaviour
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
 	{
 		SpawnerPositionChange(eventDetails.LoweringHeight, "Down");
+	}
+	private void OnLocationChangedEventHandler(OnLocationChangedEvent eventDetails)
+	{
+		//currentLocation = (Location)eventDetails.locationID;
+		PlayerPrefs.SetInt("LocationID", eventDetails.locationID);
 	}
 	private enum Location
 	{

@@ -14,7 +14,7 @@ public class GamePlayView : MonoBehaviour
 
 	[SerializeField] private TMP_Text _levelText;
 
-	[SerializeField] private GameObject GameOver;
+	[SerializeField] private GameObject startPanel;
 
 	[Header("HealthUI Components:")]
 	[SerializeField] private GameObject healthPanle;
@@ -23,9 +23,26 @@ public class GamePlayView : MonoBehaviour
 
 	[SerializeField] private List<GameObject> healthImageList;
 
+	[Header("PauseUI References:")]
+	[SerializeField] private GameObject pausePanel;
+
+	[Header("GameOverUI References:")]
+	[SerializeField] private GameObject GameOver;
+
+	[SerializeField] private TMP_Text highScore;
+
+	[SerializeField] private TMP_Text currentScore;
+
+	private void Update()
+	{
+		if (Input.GetMouseButtonDown(0))
+		{
+			startPanel.SetActive(false);
+		}
+	}
 	public void OnPauseButtonPresed()
 	{
-		controller.OnPauseButtonPresed();
+		pausePanel.SetActive(true);
 	}
 
 	public void SetGamePlayView(string levelText, int levelProgress, int maxLevelValue)
@@ -61,6 +78,7 @@ public class GamePlayView : MonoBehaviour
 		else
 		{
 			GameOver.SetActive(true);
+			controller.SetGameOverData();
 		}
 		
 	}
@@ -68,6 +86,20 @@ public class GamePlayView : MonoBehaviour
 	{
 		controller.ResetScene();
 		GameOver.SetActive(false);
+	}
+	public void ResumeButtonPressed()
+	{
+		pausePanel.SetActive(false);
+	}
+	public void MenuButtonPressed()
+	{
+		controller.MenuButtonPressed();
+		pausePanel.SetActive(false);
+	}
+	public void SetGameOverData(int HighScore,int CurrentScore)
+	{
+		highScore.text =HighScore.ToString();
+		currentScore.text =CurrentScore.ToString();
 	}
 
 }

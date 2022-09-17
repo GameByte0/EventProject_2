@@ -24,4 +24,16 @@ public class ShopMenuController : MonoBehaviour
 		EventManager.Instance.Raise(new OnExitButtonPressedEvent());
 		view.gameObject.SetActive(false);
 	}
+	private void SetHighScore()
+	{
+		//view.SetHighScore(//highSore from event );
+	}
+	public void SelectPicnicLocation()
+	{
+		EventManager.Instance.Raise(new OnLocationChangedEvent(0));
+	}
+	public void SelectWoodlandiaLocation()
+	{
+		EventManager.Instance.Raise(new OnLocationChangedEvent(1));
+	}
 }
