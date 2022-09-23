@@ -79,7 +79,9 @@ public class GamePlayController : MonoBehaviour
 	{
 		EventManager.Instance.Raise(new OnRestartButtonPressedEvent());
 		levelProgress = 0;
+		maxLevelValue = 5;
 		levelText = 1;
+		EventManager.Instance.Raise(new OnLevelChangedEvent(0));
 	}
 	public void MenuButtonPresse()
 	{

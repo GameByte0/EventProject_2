@@ -12,8 +12,6 @@ public class GameManager : MonoBehaviour
 
 	private static bool isReloaded=false;
 
-	private int deadZoneEnterCount;
-
 	private GameState gameState;
 
 	#region Unity Editor
@@ -46,10 +44,6 @@ public class GameManager : MonoBehaviour
 
 	private void Update()
 	{
-		if (deadZoneEnterCount>3)
-		{
-			gameState = GameState.GameOver;
-		}
 		if (gameState == GameState.GamePlay)
 		{
 			spawner.SetActive(true);
@@ -79,14 +73,14 @@ public class GameManager : MonoBehaviour
 	}
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
 	{
-		deadZoneEnterCount++;
-		Debug.Log(deadZoneEnterCount);
+		
 	}
 	private void OnRestartButtonPressedEventHandler(OnRestartButtonPressedEvent eventDetails)
 	{
 		SceneManager.UnloadSceneAsync(1);
 		SceneManager.LoadSceneAsync(1,LoadSceneMode.Additive);
 		isReloaded = true;
+		Time.timeScale = 1f;
 	}
 	private void OnLocationChangedEventHandler(OnLocationChangedEvent eventDetails)
 	{

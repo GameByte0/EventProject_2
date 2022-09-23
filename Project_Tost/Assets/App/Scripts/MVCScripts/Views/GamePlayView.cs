@@ -33,13 +33,22 @@ public class GamePlayView : MonoBehaviour
 
 	[SerializeField] private TMP_Text currentScore;
 
+	private int _health;
 	private void Update()
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
 			startPanel.SetActive(false);
 		}
+		if (healthImageList.Count > _health)
+		{
+			for (int i = 0; i < healthImageList.Count - _health; i++)
+			{
+				Destroy(healthImageList[healthImageList.Count]);
+			}
+		}
 	}
+
 	public void OnPauseButtonPresed()
 	{
 		pausePanel.SetActive(true);
@@ -57,7 +66,8 @@ public class GamePlayView : MonoBehaviour
 
 	public void SetHealth(int health)
 	{
-		if (healthImageList.Count==health)
+		_health = health;
+		if (healthImageList.Count == health)
 		{
 			return;
 		}
@@ -70,17 +80,17 @@ public class GamePlayView : MonoBehaviour
 
 	public void ChangeHealthCount()
 	{
-		if (healthImageList.Count!=0)
+		if (healthImageList.Count != 0)
 		{
-			Destroy(healthImageList[healthImageList.Count-1]);
-			healthImageList.Remove(healthImageList[healthImageList.Count-1]);
+			Destroy(healthImageList[healthImageList.Count - 1]);
+			healthImageList.Remove(healthImageList[healthImageList.Count - 1]);
 		}
 		else
 		{
 			GameOver.SetActive(true);
 			controller.SetGameOverData();
 		}
-		
+
 	}
 	public void RestartScene()
 	{
@@ -96,10 +106,10 @@ public class GamePlayView : MonoBehaviour
 		controller.MenuButtonPressed();
 		pausePanel.SetActive(false);
 	}
-	public void SetGameOverData(int HighScore,int CurrentScore)
+	public void SetGameOverData(int HighScore, int CurrentScore)
 	{
-		highScore.text =HighScore.ToString();
-		currentScore.text =CurrentScore.ToString();
+		highScore.text = HighScore.ToString();
+		currentScore.text = CurrentScore.ToString();
 	}
 
 }

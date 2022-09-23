@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 371d8afedc28a984fb303caf3bdf7b76, type: 3}
-  m_Name: Default
+  m_Name: Toast
   m_EditorClassIdentifier: 
-  LocationName: Default
+  LocationName: Toast
   LocationsTostComponents:
-  - {fileID: 1097985096150734512, guid: 99ed4ad0003bcfc4e8cffd2888673910, type: 3}
-  - {fileID: 1120352780201901226, guid: baa94eb7b75675341bdfe7372af98851, type: 3}
+  - {fileID: 597142033907323350, guid: 0f61c2973393be849a73b2c4282ab35d, type: 3}
+  - {fileID: 6287176663085035174, guid: 2ff53752e0dd3794e911ad6d0a3ddea2, type: 3}

@@ -22,7 +22,7 @@ public class SpawnerController2 : MonoBehaviour
 
 	[SerializeField] private Location currentLocation;
 
-	[SerializeField] private int speed;
+	[SerializeField] private float speed = 3f;
 
 	private GameObject currentlyUsingObject;
 
@@ -45,13 +45,13 @@ public class SpawnerController2 : MonoBehaviour
 	#region Unity Methods
 	private void OnEnable()
 	{
-		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
+		EventManager.Instance.AddListener<OnLevelChangedEvent>(OnLevelChangedEventHandler);
 		EventManager.Instance.AddListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 		EventManager.Instance.AddListener<OnLocationChangedEvent>(OnLocationChangedEventHandler);
 	}
 	private void OnDisable()
 	{
-		EventManager.Instance.AddListener<OnTostComponentCollidesEvent>(OnTostComponentCollidesEventHandler);
+		EventManager.Instance.AddListener<OnLevelChangedEvent>(OnLevelChangedEventHandler);
 		EventManager.Instance.RemoveListener<OnDeadZoneEnterEvent>(OnDeadZoneEnterEventHandler);
 
 	}
@@ -102,6 +102,7 @@ public class SpawnerController2 : MonoBehaviour
 			//currentlyUsingObject.GetComponent<Rigidbody>().velocity = Vector3.down * 10;
 			EventManager.Instance.Raise(new OnTostComponentDropsEvent());
 
+			speed += 0.02f;
 			isActivated = true;
 		}
 	}
@@ -111,9 +112,9 @@ public class SpawnerController2 : MonoBehaviour
 	{//if need to add new location just create scriptable object and case for location//
 		switch (currentLocation)
 		{
-			case Location.DEFAULT:
+			case Location.TOAST:
 				mainPool.Clear();
-				foreach (GameObject obj in componentsDictionary["Default"])
+				foreach (GameObject obj in componentsDictionary["Toast"])
 				{
 					for (int i = 0; i < poolSize; i++)
 					{
@@ -165,7 +166,7 @@ public class SpawnerController2 : MonoBehaviour
 	private IEnumerator MakeDynamic(GameObject obj)
 	{
 		yield return new WaitForFixedUpdate();
-		obj.GetComponent<Rigidbody>().isKinematic = false;
+		obj.GetComponentInChildren<Rigidbody>().isKinematic = false;
 	}
 
 	private void SpawnerPositionChange(float height, string direction)
@@ -178,7 +179,7 @@ public class SpawnerController2 : MonoBehaviour
 		if (direction == "Up")
 		{
 			//***Remove 0.5f after adding real prefabs***//
-			transform.position += new Vector3(0, height + 0.5f, 0);
+			transform.position += new Vector3(0, height/2 , 0);
 			DeadZone.transform.position += new Vector3(0f, height, 0f);
 		}
 		else if (direction == "Down")
@@ -191,7 +192,10 @@ public class SpawnerController2 : MonoBehaviour
 	private void SpawnerMove()
 	{
 		//Makes Spawner move horizontally
-		transform.position = new Vector3(Mathf.PingPong(Time.time * speed, 10) - 5, transform.position.y, transform.position.z);
+		//transform.position = new Vector3((Mathf.PingPong(speed , 10) - 5), transform.position.y, transform.position.z);
+
+		transform.position = new Vector3(Mathf.Sin(Time.time*speed)*5, transform.position.y, transform.position.z);
+
 	}
 
 	private void MakeVisible()
@@ -212,15 +216,20 @@ public class SpawnerController2 : MonoBehaviour
 		if (reservPool.Count >= 10 && isReserveObjectAdded)
 		{
 			GameObject componentToDeactivate = reservPool[reservPoolIndex];
-			componentToDeactivate.GetComponent<Rigidbody>().isKinematic = true;
+			componentToDeactivate.GetComponentInChildren<Rigidbody>().isKinematic = true;
 			reservPoolIndex++;
 			isReserveObjectAdded = false;
 			//Work with pool clearing integration
 		}
 	}
-	private void OnTostComponentCollidesEventHandler(OnTostComponentCollidesEvent eventDetails)
+	private void OnLevelChangedEventHandler(OnLevelChangedEvent eventDetails)
 	{
-		DeactivateTostComponent();
+		if (eventDetails.SpawnerSpeed == 0)
+		{
+			speed = 1.5f;
+		}
+
+
 	}
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
 	{
@@ -233,7 +242,7 @@ public class SpawnerController2 : MonoBehaviour
 	}
 	private enum Location
 	{
-		DEFAULT,
+		TOAST,
 		WOODLANDIA,
 		MIX
 	}
