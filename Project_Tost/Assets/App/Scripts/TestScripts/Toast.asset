@@ -16,3 +16,4 @@ MonoBehaviour:
   LocationsTostComponents:
   - {fileID: 597142033907323350, guid: 0f61c2973393be849a73b2c4282ab35d, type: 3}
   - {fileID: 6287176663085035174, guid: 2ff53752e0dd3794e911ad6d0a3ddea2, type: 3}
+  - {fileID: 6123065427562570793, guid: 50a8547123672f446b130fdb77e7f71d, type: 3}

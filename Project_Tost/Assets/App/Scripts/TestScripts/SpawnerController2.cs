@@ -17,6 +17,13 @@ public class SpawnerController2 : MonoBehaviour
 
 	[SerializeField] private int poolSize;
 
+	private int poolIndex;
+
+	private int pooledElementNumber;
+
+	private int internalPoolSize;
+
+
 	[Header("Additional Settings")]
 	[SerializeField] GameObject DeadZone;
 
@@ -39,6 +46,8 @@ public class SpawnerController2 : MonoBehaviour
 	private bool isReserveObjectAdded;
 
 	private bool isPooled = false;
+
+	public bool isSpeedRaised = false;
 
 
 
@@ -68,6 +77,7 @@ public class SpawnerController2 : MonoBehaviour
 
 	private void Start()
 	{
+		internalPoolSize = poolSize;
 		currentLocation = (Location)PlayerPrefs.GetInt("LocationID");
 		for (int i = 0; i < locationList.Count; i++)
 		{
@@ -78,12 +88,14 @@ public class SpawnerController2 : MonoBehaviour
 	}
 	private void Update()
 	{
+
 		SpawnerMove();
 		MakeVisible();
 		if (!isPooled)
 		{
 			PoolingProcess();
 			isPooled = true;
+			pooledElementNumber = mainPool.Count / poolSize;
 		}
 
 		DeactivateTostComponent();
@@ -95,14 +107,15 @@ public class SpawnerController2 : MonoBehaviour
 
 			currentlyUsingObject.transform.SetParent(null);
 			StartCoroutine(MakeDynamic(currentlyUsingObject));
-			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y, "Up");
+			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y/3, "Up");
 			mainPool.Remove(currentlyUsingObject);
 			reservPool.Add(currentlyUsingObject);
 			isReserveObjectAdded = true;
 			//currentlyUsingObject.GetComponent<Rigidbody>().velocity = Vector3.down * 10;
 			EventManager.Instance.Raise(new OnTostComponentDropsEvent());
 
-			speed += 0.02f;
+			//speed += 0.02f;
+			isSpeedRaised = true;
 			isActivated = true;
 		}
 	}
@@ -163,12 +176,6 @@ public class SpawnerController2 : MonoBehaviour
 		}
 	}
 
-	private IEnumerator MakeDynamic(GameObject obj)
-	{
-		yield return new WaitForFixedUpdate();
-		obj.GetComponentInChildren<Rigidbody>().isKinematic = false;
-	}
-
 	private void SpawnerPositionChange(float height, string direction)
 	{
 		//Raises Spawner's positioan by spawned objects localScale.y//
@@ -179,22 +186,26 @@ public class SpawnerController2 : MonoBehaviour
 		if (direction == "Up")
 		{
 			//***Remove 0.5f after adding real prefabs***//
-			transform.position += new Vector3(0, height/2 , 0);
+			transform.position += new Vector3(0, height , 0);
 			DeadZone.transform.position += new Vector3(0f, height, 0f);
+			Debug.Log(transform.position.y);
 		}
 		else if (direction == "Down")
 		{
-			transform.position -= new Vector3(0, height + 0.5f, 0);
+			transform.position -= new Vector3(0, height, 0);
 			DeadZone.transform.position -= new Vector3(0f, height, 0f);
+			Debug.Log(transform.position.y);
 		}
 	}
 
 	private void SpawnerMove()
 	{
 		//Makes Spawner move horizontally
-		//transform.position = new Vector3((Mathf.PingPong(speed , 10) - 5), transform.position.y, transform.position.z);
+		//transform.position = new Vector3((Mathf.PingPong(Time.time*speed , 10) - 5), transform.position.y, transform.position.z);
 
 		transform.position = new Vector3(Mathf.Sin(Time.time*speed)*5, transform.position.y, transform.position.z);
+
+	
 
 	}
 
@@ -202,10 +213,8 @@ public class SpawnerController2 : MonoBehaviour
 	{
 		if (isActivated && mainPool.Count != 0)
 		{
-			currentlyUsingObject = mainPool[Random.Range(0, mainPool.Count)];
-			currentlyUsingObject.SetActive(true);
-			currentlyUsingObject.transform.position = transform.position;
-			isActivated = false;
+			StartCoroutine(MakeVisibleDelay());
+			
 		}
 
 
@@ -219,8 +228,50 @@ public class SpawnerController2 : MonoBehaviour
 			componentToDeactivate.GetComponentInChildren<Rigidbody>().isKinematic = true;
 			reservPoolIndex++;
 			isReserveObjectAdded = false;
-			//Work with pool clearing integration
+			
 		}
+	}
+
+	private IEnumerator MakeDynamic(GameObject obj)
+	{
+		yield return new WaitForFixedUpdate();
+		obj.GetComponent<Rigidbody>().isKinematic = false;
+	}
+
+	private IEnumerator MakeVisibleDelay()
+	{
+		isActivated = false;
+		currentlyUsingObject = mainPool[ToastIndex(mainPool.Count)];
+		currentlyUsingObject.SetActive(true);
+		currentlyUsingObject.transform.position = transform.position;
+		yield return new WaitForSeconds(0.2f);
+		currentlyUsingObject.GetComponent<BoxCollider>().enabled = true;
+		
+	}
+	private int ToastIndex(int poolCapacity)
+	{
+		//Debug.Log("PoolCapacity: " + poolCapacity + ", PooledObjectsNumber:  " + poolingSize);
+		if (pooledElementNumber!=poolCapacity)
+		{
+			int res=(internalPoolSize * poolIndex) - poolIndex;
+
+			poolIndex++;
+			
+			if (poolIndex==pooledElementNumber)
+			{
+				internalPoolSize--;
+				poolIndex = 0;
+			}
+
+			//Debug.Log("PoledElementsNumber:" + pooledElementNumber);
+			return res;
+		}
+		else
+		{
+			//Debug.Log("PoledElementsNumber:" + pooledElementNumber);
+			return 0;
+		}
+		
 	}
 	private void OnLevelChangedEventHandler(OnLevelChangedEvent eventDetails)
 	{
