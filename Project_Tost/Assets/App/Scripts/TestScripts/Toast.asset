@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LocationName: Toast
   LocationsTostComponents:
-  - {fileID: 597142033907323350, guid: 0f61c2973393be849a73b2c4282ab35d, type: 3}
-  - {fileID: 6287176663085035174, guid: 2ff53752e0dd3794e911ad6d0a3ddea2, type: 3}
-  - {fileID: 6123065427562570793, guid: 50a8547123672f446b130fdb77e7f71d, type: 3}
+  - {fileID: 8916455901713599127, guid: a4028683b256d534a8d3b405b40dfc9a, type: 3}
+  - {fileID: 2592728577927670731, guid: 3669a0b29f5b764409070b1480da21a7, type: 3}
+  - {fileID: 5856870672464681404, guid: 9661fdf5fd5cfa546a425419af7e6bff, type: 3}

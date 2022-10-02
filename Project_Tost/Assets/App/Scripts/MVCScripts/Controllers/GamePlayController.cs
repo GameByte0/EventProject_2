@@ -19,6 +19,14 @@ public class GamePlayController : MonoBehaviour
 
 	private int highScore=1;
 
+	//private int levelIndex=0;
+
+	private bool isLimitReached=false;
+
+	private bool isContinuing=false;
+
+	private bool isLocationChanged=true;
+
 	private void OnEnable()
 	{
 		EventManager.Instance.AddListener<OnPlayButtonPressedEvent>(OnPlayButtonPressedEventHandler);
@@ -46,13 +54,22 @@ public class GamePlayController : MonoBehaviour
 		SetGamePlayView();
 		if (levelProgress == maxLevelValue)
 		{
+			if (levelText<5)
+			{
+				maxLevelValue += 2;
+			}
 			levelText++;
 			levelProgress = 0;
-			maxLevelValue += 2;
+			
+			isLimitReached = false;
 		}
 		if (levelProgress < 0)
 		{
 			levelProgress = 0;
+		}
+		if (levelText%5==0)
+		{
+			NextLevel();
 		}
 	}
 
@@ -75,6 +92,33 @@ public class GamePlayController : MonoBehaviour
 	{
 		view.ChangeHealthCount();
 	}
+	private void NextLevel()
+	{
+
+		if (isLimitReached==false)
+		{
+			isContinuing = true;
+			isLimitReached = true;
+
+			//PlayerPrefs.SetInt()
+			if (isLocationChanged)
+			{
+				EventManager.Instance.Raise(new OnLocationChangedEvent(1));
+				isLocationChanged = !isLocationChanged;
+			}
+			else
+			{
+				EventManager.Instance.Raise(new OnLocationChangedEvent(0));
+				isLocationChanged = !isLocationChanged;
+			}
+			
+			EventManager.Instance.Raise(new OnLevelChangedEvent(1));
+
+			EventManager.Instance.Raise(new OnRestartButtonPressedEvent());
+
+		}
+		
+	}
 	public void ResetScene()
 	{
 		EventManager.Instance.Raise(new OnRestartButtonPressedEvent());
@@ -87,6 +131,10 @@ public class GamePlayController : MonoBehaviour
 	{
 		//view.//pause off;//
 		//EventManager.Instance.Raise(new OnExitButtonPressedEvent());
+	}
+	public void GameOver()
+	{
+		isContinuing = false;
 	}
 	public void SetGameOverData()
 	{
@@ -129,7 +177,11 @@ public class GamePlayController : MonoBehaviour
 	}
 	private void OnRestartButtonPressedEventHandler(OnRestartButtonPressedEvent eventDetails)
 	{
-		SetHealth();
+		if (!isContinuing)
+		{
+			SetHealth();
+		}
+		
 	}
 	#endregion
 

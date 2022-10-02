@@ -7,7 +7,7 @@ public class SpawnerController2 : MonoBehaviour
 {
 
 	[SerializeField] private Dictionary<string, List<GameObject>> componentsDictionary;
-
+	[SerializeField] private int LocationID;
 	[Header("Pools and Settings")]
 	[SerializeField] private List<LocationsSO> locationList;
 
@@ -29,7 +29,7 @@ public class SpawnerController2 : MonoBehaviour
 
 	[SerializeField] private Location currentLocation;
 
-	[SerializeField] private float speed = 3f;
+	[SerializeField] private float speed = 1.5f;
 
 	private GameObject currentlyUsingObject;
 
@@ -47,7 +47,7 @@ public class SpawnerController2 : MonoBehaviour
 
 	private bool isPooled = false;
 
-	public bool isSpeedRaised = false;
+	public bool isSpeedRaised ;
 
 
 
@@ -78,16 +78,37 @@ public class SpawnerController2 : MonoBehaviour
 	private void Start()
 	{
 		internalPoolSize = poolSize;
-		currentLocation = (Location)PlayerPrefs.GetInt("LocationID");
+		
 		for (int i = 0; i < locationList.Count; i++)
 		{
 			componentsDictionary.Add(locationList[i].LocationName, locationList[i].LocationsTostComponents);
 		}
-
+		///***Location Index***///
+		//if (PlayerPrefs.GetInt("LocationID"))
+		//{
+		//	PlayerPrefs.SetInt("LocationID", 1);
+		//	currentLocation = (Location)PlayerPrefs.GetInt("LocationID");
+		//}
+		//else if (PlayerPrefs.GetInt("LocationID")>1 && currentLocation == Location.WOODLANDIA)
+		//{
+		//	PlayerPrefs.SetInt("LocationID", 0);
+		//	currentLocation = (Location)PlayerPrefs.GetInt("LocationID");
+		//}
+		if (isSpeedRaised)
+		{
+			speed = PlayerPrefs.GetFloat("ToastSpeed");
+		}
+		else
+		{
+			speed += 0.5f;
+		}
+		
+		currentLocation = (Location)PlayerPrefs.GetInt("LocationID");
 
 	}
 	private void Update()
 	{
+		LocationID = PlayerPrefs.GetInt("LocationID");
 
 		SpawnerMove();
 		MakeVisible();
@@ -107,15 +128,17 @@ public class SpawnerController2 : MonoBehaviour
 
 			currentlyUsingObject.transform.SetParent(null);
 			StartCoroutine(MakeDynamic(currentlyUsingObject));
-			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y/3, "Up");
+			SpawnerPositionChange(currentlyUsingObject.transform.localScale.y, "Up");
 			mainPool.Remove(currentlyUsingObject);
 			reservPool.Add(currentlyUsingObject);
 			isReserveObjectAdded = true;
-			//currentlyUsingObject.GetComponent<Rigidbody>().velocity = Vector3.down * 10;
+			StartCoroutine(ActivateTostCompanent());
+			currentlyUsingObject.GetComponent<Rigidbody>().velocity = new Vector3(0,-1f,0);
+			//DeadZone.transform.position = new Vector3(currentlyUsingObject.transform.position.x,DeadZone.transform.position.y,DeadZone.transform.position.z);
 			EventManager.Instance.Raise(new OnTostComponentDropsEvent());
 
 			//speed += 0.02f;
-			isSpeedRaised = true;
+			
 			isActivated = true;
 		}
 	}
@@ -180,9 +203,6 @@ public class SpawnerController2 : MonoBehaviour
 	{
 		//Raises Spawner's positioan by spawned objects localScale.y//
 
-
-
-
 		if (direction == "Up")
 		{
 			//***Remove 0.5f after adding real prefabs***//
@@ -205,8 +225,6 @@ public class SpawnerController2 : MonoBehaviour
 
 		transform.position = new Vector3(Mathf.Sin(Time.time*speed)*5, transform.position.y, transform.position.z);
 
-	
-
 	}
 
 	private void MakeVisible()
@@ -214,9 +232,7 @@ public class SpawnerController2 : MonoBehaviour
 		if (isActivated && mainPool.Count != 0)
 		{
 			StartCoroutine(MakeVisibleDelay());
-			
 		}
-
 
 	}
 
@@ -231,6 +247,12 @@ public class SpawnerController2 : MonoBehaviour
 			
 		}
 	}
+	private IEnumerator ActivateTostCompanent()
+	{ GameObject currentlyDropedObject = currentlyUsingObject;
+
+		currentlyDropedObject.GetComponent<BoxCollider>().enabled = true;
+		yield return new WaitForSeconds(00.2f);
+	}
 
 	private IEnumerator MakeDynamic(GameObject obj)
 	{
@@ -244,8 +266,8 @@ public class SpawnerController2 : MonoBehaviour
 		currentlyUsingObject = mainPool[ToastIndex(mainPool.Count)];
 		currentlyUsingObject.SetActive(true);
 		currentlyUsingObject.transform.position = transform.position;
-		yield return new WaitForSeconds(0.2f);
-		currentlyUsingObject.GetComponent<BoxCollider>().enabled = true;
+		yield return new WaitForEndOfFrame();
+		
 		
 	}
 	private int ToastIndex(int poolCapacity)
@@ -279,7 +301,12 @@ public class SpawnerController2 : MonoBehaviour
 		{
 			speed = 1.5f;
 		}
-
+		else
+		{
+			speed += eventDetails.SpawnerSpeed;
+		}
+		PlayerPrefs.SetFloat("TostSpeed", speed);
+		isSpeedRaised = true;
 
 	}
 	private void OnDeadZoneEnterEventHandler(OnDeadZoneEnterEvent eventDetails)
@@ -288,8 +315,9 @@ public class SpawnerController2 : MonoBehaviour
 	}
 	private void OnLocationChangedEventHandler(OnLocationChangedEvent eventDetails)
 	{
+		//locationIndex = eventDetails.locationID;
 		//currentLocation = (Location)eventDetails.locationID;
-		PlayerPrefs.SetInt("LocationID", eventDetails.locationID);
+		PlayerPrefs.SetInt("LocationID",eventDetails.locationID);
 	}
 	private enum Location
 	{

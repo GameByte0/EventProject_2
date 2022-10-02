@@ -89,6 +89,7 @@ public class GamePlayView : MonoBehaviour
 		{
 			GameOver.SetActive(true);
 			controller.SetGameOverData();
+			controller.GameOver();
 		}
 
 	}

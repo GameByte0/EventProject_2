@@ -8,6 +8,7 @@ public class TostComponentController : MonoBehaviour
 	public bool isDeadZoneEntered=false;
 	private void OnCollisionEnter(Collision collision)
 	{
-		//gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+		gameObject.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);
 	}
+	
 }
